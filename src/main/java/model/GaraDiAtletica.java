@@ -8,6 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import lombok.Getter;
@@ -23,6 +24,8 @@ import lombok.ToString;
 @ToString
 @Getter
 @Setter
+@NamedQuery(name = "garePerVincitore", query = "SELECT g FROM GaraDiAtletica g WHERE g.vincitore.id = :id")
+@NamedQuery(name = "garePerPartecipante", query = "SELECT g FROM GaraDiAtletica g WHERE :id IN (SELECT p.id FROM Persona p WHERE p IN g.atleti)")
 public class GaraDiAtletica extends Evento {
 
 	@ManyToOne

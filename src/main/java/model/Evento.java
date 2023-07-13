@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -22,6 +23,8 @@ import org.hibernate.annotations.CascadeType;
 @Table(name = "eventi")
 //@DiscriminatorColumn(name = "tipo_evento", discriminatorType = DiscriminatorType.STRING, columnDefinition = "varchar default 'Nessuna'", length = 20)
 @Inheritance(strategy = InheritanceType.JOINED)
+
+@NamedQuery(name = "eventiSoldOut", query = "SELECT e FROM Evento e WHERE e.numeroMassimoPartecipanti = (SELECT COUNT(p) FROM Evento e1 INNER JOIN e1.partecipazioni p ON e1.id = p.evento.id WHERE e1.id = e.id)")
 public class Evento {
 
 	@Id

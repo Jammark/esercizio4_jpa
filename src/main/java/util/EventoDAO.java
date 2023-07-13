@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import model.Concerto;
 import model.Evento;
+import model.GaraDiAtletica;
+import model.PartitaDiCalcio;
+import model.Persona;
 import model.TipoConcerto;
 
 public class EventoDAO {
@@ -70,6 +73,30 @@ public class EventoDAO {
 		TypedQuery<Concerto> query = em.createQuery("SELECT c FROM Concerto c WHERE c.isStreaming = true",
 				Concerto.class);
 		return query.getResultList();
+	}
+
+	public List<PartitaDiCalcio> getPartiteVinteInCasa() {
+		return em.createNamedQuery("partiteVinteInCasa").getResultList();
+	}
+
+	public List<PartitaDiCalcio> getPartiteVinteInTrasferta() {
+		return em.createNamedQuery("partiteVinteInTrasferta").getResultList();
+	}
+
+	public List<PartitaDiCalcio> getPartitePareggiate() {
+		return em.createNamedQuery("partitePareggiate").getResultList();
+	}
+
+	public List<GaraDiAtletica> getGarePerVincitore(Persona p) {
+		TypedQuery<GaraDiAtletica> t = em.createNamedQuery("garePerVincitore", GaraDiAtletica.class);
+		t.setParameter("id", p.getId());
+		return t.getResultList();
+	}
+
+	public List<GaraDiAtletica> getGarePerPartecipante(Persona p) {
+		TypedQuery<GaraDiAtletica> t = em.createNamedQuery("garePerPartecipante", GaraDiAtletica.class);
+		t.setParameter("id", p.getId());
+		return t.getResultList();
 	}
 
 	public void close() {
