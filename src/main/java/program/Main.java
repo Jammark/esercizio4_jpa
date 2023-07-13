@@ -1,19 +1,23 @@
 package program;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.slf4j.Slf4j;
+import model.Concerto;
 import model.Evento;
+import model.GaraDiAtletica;
 import model.Location;
 import model.Partecipazione;
+import model.PartitaDiCalcio;
 import model.Persona;
 import model.Sesso;
 import model.StatoPartecipazione;
+import model.TipoConcerto;
 import model.TipoEvento;
 import util.EventoDAO;
 import util.JpaUtil;
@@ -21,9 +25,10 @@ import util.LocationDAO;
 import util.PartecipazioneDAO;
 import util.PersonaDAO;
 
+@Slf4j
 public class Main {
 
-	private static final Logger log = LoggerFactory.getLogger(Main.class);
+	// private static final Logger log = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) {
 
@@ -48,6 +53,8 @@ public class Main {
 		Scanner sc = new Scanner(System.in);
 
 		try {
+			daoL.save(l2);
+			daoL.save(l1);
 			dao.save(ev1);
 			dao.save(ev2);
 
@@ -72,13 +79,53 @@ public class Main {
 
 			log.info("Inserire...");
 			sc.nextLine();
-			// dao.delete(ev1);
+			dao.delete(ev1);
+
+			populateDB(em);
+			dao.getConcertiInStreaming().forEach(c -> log.info("Concerto in streamin: " + c));
+			dao.getConcertiPerGenere(Arrays.asList(TipoConcerto.CLASSICO, TipoConcerto.ROCK))
+					.forEach(c -> log.info("Concerto per genere: " + c));
 		} finally {
 			sc.close();
 			dao.close();
 			JpaUtil.close();
 		}
 
+	}
+
+	public static void populateDB(EntityManager em) {
+		Location l1 = new Location("stadio Olimpico", "Roma");
+
+		PartitaDiCalcio partita1 = new PartitaDiCalcio("Evento 1", LocalDate.of(2001, 6, 11), "Roma - Milan",
+				TipoEvento.PRIVATO, 600, l1, "Milan", "Roma", "Roma", 3, 1);
+		PartitaDiCalcio partita2 = new PartitaDiCalcio("Evento 2", LocalDate.of(2002, 6, 11), "Lazio - Milan",
+				TipoEvento.PRIVATO, 600, l1, "Milan", "Lazio", "Lazio", 3, 1);
+
+		Persona p1 = new Persona("Mario", "Di Carlo", "mario.dicarlo@gmail.com", LocalDate.of(1985, 12, 3),
+				Sesso.MASCHIO);
+		Persona p2 = new Persona("Maria", "Di Bella", "maria.dibella@gmail.com", LocalDate.of(1989, 8, 5),
+				Sesso.FEMMINA);
+
+		GaraDiAtletica gara1 = new GaraDiAtletica("Evento 11", LocalDate.of(2006, 6, 11), "evento atletica",
+				TipoEvento.PRIVATO, 460, l1, p2, Set.of(p1, p2));
+		Concerto concerto = new Concerto("concerto 1", LocalDate.of(2012, 5, 11), "Orchestra sinfonica",
+				TipoEvento.PRIVATO, 600, l1, TipoConcerto.CLASSICO, false);
+		Concerto concerto2 = new Concerto("concerto 2", LocalDate.of(2022, 9, 11), "Lunapop", TipoEvento.PRIVATO, 600,
+				l1, TipoConcerto.POP, true);
+		EventoDAO dao = new EventoDAO(em);
+
+		LocationDAO daoL = new LocationDAO(em);
+		daoL.save(l1);
+
+		PersonaDAO daoP = new PersonaDAO(em);
+		daoP.save(p2);
+		daoP.save(p1);
+
+		dao.save(concerto);
+		dao.save(concerto2);
+		dao.save(gara1);
+		dao.save(partita2);
+		dao.save(partita1);
 	}
 
 }

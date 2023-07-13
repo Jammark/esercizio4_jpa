@@ -5,9 +5,12 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -17,6 +20,8 @@ import org.hibernate.annotations.CascadeType;
 
 @Entity
 @Table(name = "eventi")
+//@DiscriminatorColumn(name = "tipo_evento", discriminatorType = DiscriminatorType.STRING, columnDefinition = "varchar default 'Nessuna'", length = 20)
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Evento {
 
 	@Id
@@ -32,14 +37,14 @@ public class Evento {
 	@Column
 	private String descrizione;
 
-	@Enumerated
+	@Enumerated(EnumType.STRING)
 	private TipoEvento tipoEvento;
 
 	@Column
 	private Integer numeroMassimoPartecipanti;
 
 	@ManyToOne
-	@Cascade(CascadeType.PERSIST)
+	@Cascade(CascadeType.MERGE)
 	private Location location;
 
 	@OneToMany(mappedBy = "evento")
